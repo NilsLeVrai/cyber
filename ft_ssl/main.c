@@ -45,7 +45,7 @@ void convert(char *s) {
     }
     string[j++] = '1';
     string[j++] = '\0';
-    printf("DEBUGGGG: %s\n", string);
+    printf("DEBUGGG: %s\n", string);
     putchar('\n');
     return ;
 }
