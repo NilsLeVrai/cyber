@@ -1,5 +1,6 @@
 NAME = ft_ssl
-FILES = main.c
+FILES = main.c \
+			srcs/parsing.c
 CC = cc
 CFLAGS = -Wall -Werror -Wextra
 
