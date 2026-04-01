@@ -18,6 +18,6 @@ int main(int argc, char **argv)
         write(1, "Usage\n", 6);
         return 0;
     }
-    check_parsing(argv[1]);
+    convert(argv[1]);
     return (0);
 }
