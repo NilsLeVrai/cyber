@@ -1,6 +1,8 @@
 #pragma once
 
 #include <stdlib.h>
+#include <errno.h>
+#include <fcntl.h>
 
 typedef struct s_hash_parsing {
 	int		flag_p;
