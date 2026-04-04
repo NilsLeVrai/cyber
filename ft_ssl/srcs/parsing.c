@@ -62,8 +62,8 @@ static void add_file(t_hash_parsing *parsing, char *argv, int *err) {
 		parsing->files[i] = old[i];
 		i++;
 	}
-	parsing->files[parsing->nb_files] = argv;
 	free(old);
+	parsing->files[parsing->nb_files] = argv;
 	parsing->nb_files++;
 }
 
@@ -113,7 +113,6 @@ void check_parsing(int argc, char **argv, t_hash_parsing *parsing) {
 					case 's':
 						if (i + 1 < argc) {
 							add_string(parsing, argv[i + 1]);
-							//printf("test: %s\n", parsing->strings[0]);
 							i++;
 						} else {
 							printf("no string after -s\n");
