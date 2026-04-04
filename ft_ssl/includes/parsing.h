@@ -1,5 +1,21 @@
 #pragma once
 
-#include "ft_ssl.h"
+#include <stdlib.h>
 
-void convert(const char *s);
+typedef struct s_hash_parsing {
+	int		flag_p;
+	int		flag_q;
+	int		flag_r;
+	char	**strings;
+	int		nb_strings;
+	char	**files;
+	int		nb_files;
+} t_hash_parsing;
+
+typedef struct	s_command {
+	char	*name;
+	char	*(*func)(t_hash_parsing *);
+} t_command;
+
+char *dispatcher(char *argv, t_hash_parsing *parsing);
+void check_parsing(int argc, char **argv, t_hash_parsing *parsing);

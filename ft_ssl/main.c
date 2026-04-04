@@ -14,10 +14,16 @@ free
 
 int main(int argc, char **argv)
 {
+	t_hash_parsing	*parsing;
+	char			*command;
+
+	parsing = NULL;
+	(void) command;
     if (argc < 2) {
         write(1, "Usage\n", 6);
         return 0;
     }
-    convert(argv[1]);
+	//check_parsing(argc, argv, parsing);
+	command = dispatcher(argv[1], parsing);
     return (0);
 }

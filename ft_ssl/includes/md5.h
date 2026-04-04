@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ft_ssl.h"
-
+#include "parsing.h"
+#include <unistd.h>
 
 struct four_word_buffer {
 	uint32_t word_a;
@@ -9,3 +9,5 @@ struct four_word_buffer {
 	uint32_t word_c;
 	uint32_t word_d;
 };
+
+char	*ft_md5(t_hash_parsing *parsing);

@@ -1,6 +1,8 @@
 NAME = ft_ssl
 FILES = main.c \
-			srcs/parsing.c
+			srcs/parsing.c \
+			srcs/md5.c \
+			srcs/sha256.c
 CC = cc
 CFLAGS = -Wall -Werror -Wextra
 
@@ -16,4 +18,9 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+push:
+	git add .
+	git commit -m "$(MSG)"
+	git push
+
+.PHONY: all clean fclean re push
