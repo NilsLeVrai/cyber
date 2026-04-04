@@ -20,7 +20,7 @@ re: fclean all
 
 push:
 	make fclean
-	git add .
+	git -C .. add .
 	git commit -m "$(MSG)"
 	git push
 
