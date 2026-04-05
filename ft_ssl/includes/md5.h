@@ -1,6 +1,7 @@
 #pragma once
 
 #include "parsing.h"
+#include "utils.h"
 #include <unistd.h>
 #include <stdint.h>
 
@@ -12,3 +13,5 @@ typedef struct s_four_word_buffer {
 } t_words;
 
 char	*ft_md5(t_hash_parsing *parsing);
+void	operations(t_words *words, uint32_t *M);
+char	*padded_buffer(char *message, size_t len, size_t *padded_len);

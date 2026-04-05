@@ -2,7 +2,8 @@ NAME = ft_ssl
 FILES = main.c \
 			srcs/parsing.c \
 			srcs/md5.c \
-			srcs/sha256.c
+			srcs/sha256.c \
+			srcs/utils.c
 CC = cc
 CFLAGS = -Wall -Werror -Wextra
 

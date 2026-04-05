@@ -23,14 +23,6 @@ static uint32_t K[64] = {0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
 				0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1,
 				0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391};
 
-static int ft_strlen(char *s) {
-	size_t i = 0;
-	while (s[i] != '\0') {
-		i++;
-	}
-	return i;
-}
-
 static void init_words(t_words *words) {
 
 	words->a = 0x67452301;
@@ -40,7 +32,7 @@ static void init_words(t_words *words) {
 	return ;
 }
 
-static char *padded_buffer(char *message, size_t len, size_t *padded_len) {
+char *padded_buffer(char *message, size_t len, size_t *padded_len) {
 
 	char	*md5_buffer;
 	size_t			tmp;
@@ -64,23 +56,7 @@ static char *padded_buffer(char *message, size_t len, size_t *padded_len) {
 	return md5_buffer;
 }
 
-static uint32_t F(uint32_t b, uint32_t c, uint32_t d) {
-	return (b & c) | (~b & d);
-}
-
-static uint32_t G(uint32_t b, uint32_t c, uint32_t d) {
-	return (b & d) | (c & ~d);
-}
-
-static uint32_t H(uint32_t b, uint32_t c, uint32_t d) {
-	return b ^ c ^ d;
-}
-
-static uint32_t I(uint32_t b, uint32_t c, uint32_t d) {
-	return c ^ (b | ~d);
-}
-
-static void operations(t_words *words, uint32_t *M) {
+void operations(t_words *words, uint32_t *M) {
 
 	uint32_t	h0 = words->a;
 	uint32_t	h1 = words->b;
@@ -92,17 +68,17 @@ static void operations(t_words *words, uint32_t *M) {
 		uint32_t	g;
 		uint32_t	tmp;
 		if (i <= 15) {
-			tmp = F(words->b, words->c, words->d);
+			tmp = (words->b & words->c) | (~words->b & words->d);
 			g = i;
 		} else if (i >= 16 && i <= 31) {
-			tmp = G(words->b, words->c, words->d);
+			tmp = (words->b & words->d) | (words->c & ~words->d);
 			g = (5 * i + 1) % 16;
 		} else if (i >= 32 && i <= 47) {
-			tmp = H(words->b, words->c, words->d);
+			tmp = words->b ^ words->c ^ words->d;
 			g = (3 * i + 5) % 16;
 			
 		} else {
-			tmp = I(words->b, words->c, words->d);
+			tmp = words->c ^ (words->b | ~words->d);
 			g = (7 * i) % 16;
 		}
 		f = tmp;
@@ -110,34 +86,12 @@ static void operations(t_words *words, uint32_t *M) {
 		words->d = words->c;
 		words->c = words->b;
 		words->b = words->b + (((words->a + f + K[i] + M[g]) << S[i]) | ((words->a + f + K[i] + M[g]) >> (32 - S[i]))); 
-		//words->b + ((words->a + f + K[i] + M[g]) << S[i]) | ((words->a + f + K[i] + M[g]) >> (32 - S[i]));
 		words->a = tmp;
 	}
 	words->a += h0;
 	words->b += h1;
 	words->c += h2;
 	words->d += h3;
-}
-
-/*
-pour chaque bloc de 512 bits du message
-        var entier temp := d
-        d := c
-        c := b
-        b := leftrotate((a + f + k[i] + w[g]), r[i]) + b
-        a := temp
-    fin pour
-*/
-
-static char *to_hex(uint32_t value, char *output) {
-
-	uint8_t	byte;
-	for (int i = 0; i < 4; i++) {
-		byte = (value >> (i * 8)) & 0xFF;
-		output[i * 2]     = "0123456789abcdef"[(byte >> 4) & 0xF];                          
-		output[i * 2 + 1] = "0123456789abcdef"[byte & 0xF];
-	}
-	return output;
 }
 
 char	*ft_md5(t_hash_parsing *parsing) {
