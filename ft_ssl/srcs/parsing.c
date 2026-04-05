@@ -119,7 +119,7 @@ void check_parsing(int argc, char **argv, t_hash_parsing *parsing) {
 						}
 						break;
 					default:
-						printf("Invalid arg\n");
+						printf("Invalid arg: %c\n", argv[i][j]);  
 						break;
 				}
 			}
