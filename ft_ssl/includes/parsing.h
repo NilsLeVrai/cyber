@@ -16,8 +16,8 @@ typedef struct s_hash_parsing {
 
 typedef struct	s_command {
 	char	*name;
-	char	*(*func)(t_hash_parsing *);
+	void	(*func)(t_hash_parsing *);
 } t_command;
 
-char *dispatcher(char *argv, t_hash_parsing *parsing);
+void dispatcher(char *argv, t_hash_parsing *parsing);
 void check_parsing(int argc, char **argv, t_hash_parsing *parsing);

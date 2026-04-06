@@ -18,17 +18,17 @@ void init_parsing(t_hash_parsing *parsing) {
 	return;
 }
 
-char	*dispatcher(char *command, t_hash_parsing *parsing) {
+void	dispatcher(char *command, t_hash_parsing *parsing) {
 	int i;
 
 	i = 0;
 	while (commands[i].name != NULL) {
 		if (ft_strcmp(command, commands[i].name) == 0) {
-			return commands[i].func(parsing);
+			commands[i].func(parsing);
+			return ;
 		}
 		i++;
 	}
-	return NULL;
 }
 
 static void add_file(t_hash_parsing *parsing, char *argv, int *err) {
@@ -82,11 +82,11 @@ static void add_string(t_hash_parsing *parsing, char *str) {
 
 void check_parsing(int argc, char **argv, t_hash_parsing *parsing) {
 
-	//int flag_s;
 	int		err;
 
-	//flag_s = 0;
 	err = 0;
+	if (argc < 2)
+		write(1, "Usage\n", 6); // change write usage
 	init_parsing(parsing);
 	for (int i = 2; i < argc; i++) {
 		if (argv[i][0] == '-') {
@@ -111,19 +111,13 @@ void check_parsing(int argc, char **argv, t_hash_parsing *parsing) {
 						}
 						break;
 					default:
-						printf("Invalid arg: %c\n", argv[i][j]);  
 						break;
 				}
 			}
 		} else {
 			add_file(parsing, argv[i], &err);
 			if (err) {
-				char *msg = argv[i];
-				write(2, "ft_ssl: ", 8);
-				write(2, msg, strlen(msg));
-				write(2, ": ", 2);
-				write(2, strerror(err), strlen(strerror(err)));
-				write(2, "\n", 1);
+				write_error(argv[i], &err);
 				err = 0;
 			}
 		}

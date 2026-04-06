@@ -1,5 +1,5 @@
 #include "includes/ft_ssl.h"
-
+#include <stdio.h>
 /*
 MD5("The quick brown fox jumps over the lazy dog") =
 9e107d9d372bb6826bd81d3542a419d6
@@ -15,14 +15,8 @@ free
 int main(int argc, char **argv)
 {
 	t_hash_parsing	parsing;
-	char			*command;
 
-	(void) command;
-    if (argc < 2) {
-        write(1, "Usage\n", 6);
-        return 0;
-    }
 	check_parsing(argc, argv, &parsing);
-	command = dispatcher(argv[1], &parsing);
+	dispatcher(argv[1], &parsing);
     return (0);
 }

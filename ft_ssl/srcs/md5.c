@@ -32,6 +32,74 @@ static void init_words(t_words *words) {
 	return ;
 }
 
+char *compute_hash(char *msg,  size_t len) {
+
+	char	*padded;
+	char	*hash;
+	t_words	words;
+	size_t	padded_len;
+
+	init_words(&words);
+	padded = padded_buffer(msg, len, &padded_len);
+	for (char *chunk = padded; chunk < padded + padded_len; chunk += 64)
+		operations(&words, (uint32_t *)chunk);
+	hash = malloc(sizeof(char) * 33);
+	if (!hash)
+		return NULL;
+	to_hex(words.a, hash);
+	to_hex(words.b, hash + 8);
+	to_hex(words.c, hash + 16);
+	to_hex(words.d, hash + 24);
+	hash[32] = '\0';
+	return hash;
+}
+
+void md5_stdin(t_hash_parsing *parsing) {
+
+	char	*stdin_buffer;
+	char	*hash;
+	size_t	len;
+
+	(void)parsing;
+	len = 0;
+	stdin_buffer = read_stdin(&len);
+	hash = compute_hash(stdin_buffer, len);
+	write(1, "(\"", 2);
+	write(1, stdin_buffer, len);
+	write(1, ")\"= ", 4);
+	write(1, hash, 32);
+	write(1, "\n", 1);
+	free(hash);
+	return ;
+}
+
+char *read_stdin(size_t *len) {
+
+	char	buf[1024];
+	char	*stdin_buffer;
+	char	*tmp;
+	int		n;
+
+	stdin_buffer = NULL;
+	while((n = read(0, buf, 1024)) > 0) {
+		tmp = malloc(sizeof(char) * (n + *len));
+		if (!tmp)
+			return NULL;
+		for (size_t i = 0; i < *len; i++)
+			tmp[i] = stdin_buffer[i];
+		for (int j = 0; j < n; j++)
+			tmp[j + *len] = buf[j];
+		free(stdin_buffer);
+		stdin_buffer = tmp;
+		*len += n;
+	}
+	if (stdin_buffer[*len - 1] == '\n') {
+		stdin_buffer[*len - 1] = '\0';
+		(*len)--;
+	}
+	return stdin_buffer;
+}
+
 char *padded_buffer(char *message, size_t len, size_t *padded_len) {
 
 	char	*md5_buffer;
@@ -94,25 +162,35 @@ void operations(t_words *words, uint32_t *M) {
 	words->d += h3;
 }
 
-char	*ft_md5(t_hash_parsing *parsing) {
+void	ft_md5(t_hash_parsing *parsing) {
 
-	char			*hash;
-	char			*padded;
-	t_words			words;
-	size_t			padded_len;
+	size_t	len;
+	char	*hash;
+	char	*cmd;
+	char	*stdin_buffer;
 
-	init_words(&words);
-	padded = padded_buffer(parsing->strings[0], ft_strlen(parsing->strings[0]), &padded_len);
-	for (char *chunk = padded; chunk < padded + padded_len; chunk += 64)
-		operations(&words, (uint32_t *)chunk);
-	hash = malloc(sizeof(char) * 33);
-	if (!hash)
-		return NULL;
-	to_hex(words.a, hash);
-	to_hex(words.b, hash + 8);
-	to_hex(words.c, hash + 16);
-	to_hex(words.d, hash + 24);
-	hash[32] = '\0';
-	write(1, hash, 32);
-	return hash;
+	hash = NULL;
+	cmd = "MD5";
+	len = 0;
+	if (parsing->flag_p) {
+		stdin_buffer = read_stdin(&len);
+		hash = compute_hash(stdin_buffer, len);
+		print_hash(hash, stdin_buffer, parsing, cmd, STDIN);
+	}
+	for (int i = 0; i < parsing->nb_strings; i++) {
+		hash = compute_hash(parsing->strings[i], ft_strlen(parsing->strings[i]));
+		print_hash(hash, parsing->strings[i], parsing, cmd, STRING);		
+	}
+/*	for (int i = 0; i < parsing->nb_files; i++) {
+
+		hash = compute_hash(parsing->files[0], ft_strlen(parsing->files[0]));
+		print_hash(hash, parsing->strings[i], parsing, cmd);
+	}*/
+	len = 0;
+	if (!parsing->flag_p && !parsing->nb_strings && !parsing->nb_files) {
+		hash = compute_hash(read_stdin(&len), len);
+		print_hash(hash, NULL, parsing, cmd, STDIN);	
+	}
+	free(hash);
+	return ;
 }
