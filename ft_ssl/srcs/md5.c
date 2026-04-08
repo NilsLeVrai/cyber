@@ -73,6 +73,35 @@ void md5_stdin(t_hash_parsing *parsing) {
 	return ;
 }
 
+char *read_file(char *path, size_t *len) {
+
+	char	buf[1024];
+	char	*file_buffer;
+	char	*tmp;
+	int		n;
+	int		fd;
+
+
+	file_buffer = NULL;
+	fd = open(path, O_RDONLY);
+	if (fd == -1)
+		return NULL;
+	while((n = read(fd, buf, 1024)) > 0) {
+		tmp = malloc(sizeof(char) * (n + *len));
+		if (!tmp)
+			return NULL;
+		for (size_t i = 0; i < *len; i++)
+			tmp[i] = file_buffer[i];
+		for (int j = 0; j < n; j++)
+			tmp[j + *len] = buf[j];
+		free(file_buffer);
+		file_buffer = tmp;
+		*len += n;
+	}
+	close(fd);
+	return file_buffer;
+}
+
 char *read_stdin(size_t *len) {
 
 	char	buf[1024];
@@ -168,6 +197,7 @@ void	ft_md5(t_hash_parsing *parsing) {
 	char	*hash;
 	char	*cmd;
 	char	*stdin_buffer;
+	char	*file_buffer;
 
 	hash = NULL;
 	cmd = "MD5";
@@ -181,16 +211,21 @@ void	ft_md5(t_hash_parsing *parsing) {
 		hash = compute_hash(parsing->strings[i], ft_strlen(parsing->strings[i]));
 		print_hash(hash, parsing->strings[i], parsing, cmd, STRING);		
 	}
-/*	for (int i = 0; i < parsing->nb_files; i++) {
-
-		hash = compute_hash(parsing->files[0], ft_strlen(parsing->files[0]));
-		print_hash(hash, parsing->strings[i], parsing, cmd);
-	}*/
+	for (int i = 0; i < parsing->nb_files; i++) {
+		len = 0;
+		file_buffer = read_file(parsing->files[i], &len);
+		hash = compute_hash(file_buffer, len);
+		print_hash(hash, parsing->files[i], parsing, cmd, FILE_SRC);
+		free(file_buffer);
+		free(hash);
+		hash = NULL;
+	}
 	len = 0;
 	if (!parsing->flag_p && !parsing->nb_strings && !parsing->nb_files) {
 		hash = compute_hash(read_stdin(&len), len);
 		print_hash(hash, NULL, parsing, cmd, STDIN);	
 	}
-	free(hash);
+	if (hash)
+		free(hash);
 	return ;
 }
