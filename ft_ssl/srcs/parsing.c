@@ -1,5 +1,4 @@
 #include "../includes/ft_ssl.h"
-#include <stdio.h> //debug
 
 static t_command commands[] = {
 	{"md5", ft_md5},
@@ -47,7 +46,7 @@ static void add_file(t_hash_parsing *parsing, char *argv, int *err) {
 	i = 0;
 	parsing->files = malloc(sizeof(char *) * (parsing->nb_files + 1));
 	if (!parsing->files) {
-		printf("alloc failed\n");
+		write(1, "alloc failed\n", 13);
 		return;
 	}
 	while (i < parsing->nb_files) {
@@ -68,7 +67,7 @@ static void add_string(t_hash_parsing *parsing, char *str) {
 	old = parsing->strings;
 	parsing->strings = malloc(sizeof(char *) * (parsing->nb_strings + 1));
 	if (!parsing->strings) {
-		printf("alloc failed\n");
+		write(1, "alloc failed\n", 13);
 		return;
 	}
 	while (i < parsing->nb_strings) {
@@ -86,7 +85,7 @@ void check_parsing(int argc, char **argv, t_hash_parsing *parsing) {
 
 	err = 0;
 	if (argc < 2)
-		write(1, "Usage\n", 6); // change write usage
+		write(1, "Usage\n", 6); // change usage for a cooler one
 	init_parsing(parsing);
 	for (int i = 2; i < argc; i++) {
 		if (argv[i][0] == '-') {
@@ -107,7 +106,7 @@ void check_parsing(int argc, char **argv, t_hash_parsing *parsing) {
 							add_string(parsing, argv[i + 1]);
 							i++;
 						} else {
-							printf("no string after -s\n");
+							write(1, "no string after -s\n", 19);
 						}
 						break;
 					default:
