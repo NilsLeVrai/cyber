@@ -54,25 +54,6 @@ char *compute_hash(char *msg,  size_t len) {
 	return hash;
 }
 
-void md5_stdin(t_hash_parsing *parsing) {
-
-	char	*stdin_buffer;
-	char	*hash;
-	size_t	len;
-
-	(void)parsing;
-	len = 0;
-	stdin_buffer = read_stdin(&len);
-	hash = compute_hash(stdin_buffer, len);
-	write(1, "(\"", 2);
-	write(1, stdin_buffer, len);
-	write(1, ")\"= ", 4);
-	write(1, hash, 32);
-	write(1, "\n", 1);
-	free(hash);
-	return ;
-}
-
 char *read_file(char *path, size_t *len) {
 
 	char	buf[1024];
@@ -111,7 +92,7 @@ char *read_stdin(size_t *len) {
 
 	stdin_buffer = NULL;
 	while((n = read(0, buf, 1024)) > 0) {
-		tmp = malloc(sizeof(char) * (n + *len));
+		tmp = malloc(sizeof(char) * (n + *len + 1));
 		if (!tmp)
 			return NULL;
 		for (size_t i = 0; i < *len; i++)
@@ -122,10 +103,7 @@ char *read_stdin(size_t *len) {
 		stdin_buffer = tmp;
 		*len += n;
 	}
-	if (stdin_buffer[*len - 1] == '\n') {
-		stdin_buffer[*len - 1] = '\0';
-		(*len)--;
-	}
+	stdin_buffer[*len] = '\0';
 	return stdin_buffer;
 }
 

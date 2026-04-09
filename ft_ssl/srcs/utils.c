@@ -54,9 +54,8 @@ void print_hash(char *hash, char *source, t_hash_parsing *parsing, char *cmd, t_
 		write(1, source, ft_strlen(source));
 		write(1, "\n", 1);
 	} else if (parsing->flag_p) {
-		write(1, "(\"", 2);
 		write(1, source, ft_strlen(source));
-		write(1, "\")= ", 4);
+		write(1, "(stdin)= ", 9);
 		write(1, hash, ft_strlen(hash));
 		write(1, "\n", 1);
 	} else if (type == STDIN && !parsing->flag_p) {
