@@ -42,6 +42,7 @@ char *compute_hash(char *msg,  size_t len) {
 	padded = padded_buffer(msg, len, &padded_len);
 	for (char *chunk = padded; chunk < padded + padded_len; chunk += 64)
 		operations(&words, (uint32_t *)chunk);
+	free(padded);
 	hash = malloc(sizeof(char) * 33);
 	if (!hash)
 		return NULL;
@@ -183,10 +184,15 @@ void	ft_md5(t_hash_parsing *parsing) {
 		stdin_buffer = read_stdin(&len);
 		hash = compute_hash(stdin_buffer, len);
 		print_hash(hash, stdin_buffer, parsing, cmd, STDIN);
+		free(stdin_buffer);
+		free(hash);
+		hash = NULL;
 	}
 	for (int i = 0; i < parsing->nb_strings; i++) {
 		hash = compute_hash(parsing->strings[i], ft_strlen(parsing->strings[i]));
-		print_hash(hash, parsing->strings[i], parsing, cmd, STRING);		
+		print_hash(hash, parsing->strings[i], parsing, cmd, STRING);
+		free(hash);
+		hash = NULL;
 	}
 	for (int i = 0; i < parsing->nb_files; i++) {
 		len = 0;
@@ -199,8 +205,10 @@ void	ft_md5(t_hash_parsing *parsing) {
 	}
 	len = 0;
 	if (!parsing->flag_p && !parsing->nb_strings && !parsing->nb_files) {
-		hash = compute_hash(read_stdin(&len), len);
-		print_hash(hash, NULL, parsing, cmd, STDIN);	
+		stdin_buffer = read_stdin(&len);
+		hash = compute_hash(stdin_buffer, len);
+		print_hash(hash, NULL, parsing, cmd, STDIN);
+		free(stdin_buffer);
 	}
 	if (hash)
 		free(hash);

@@ -21,3 +21,4 @@ typedef struct	s_command {
 
 void dispatcher(char *argv, t_hash_parsing *parsing);
 void check_parsing(int argc, char **argv, t_hash_parsing *parsing);
+void free_parsing(t_hash_parsing *parsing);

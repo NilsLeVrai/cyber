@@ -17,6 +17,11 @@ void init_parsing(t_hash_parsing *parsing) {
 	return;
 }
 
+void	free_parsing(t_hash_parsing *parsing) {
+	free(parsing->strings);
+	free(parsing->files);
+}
+
 void	dispatcher(char *command, t_hash_parsing *parsing) {
 	int i;
 
@@ -24,6 +29,7 @@ void	dispatcher(char *command, t_hash_parsing *parsing) {
 	while (commands[i].name != NULL) {
 		if (ft_strcmp(command, commands[i].name) == 0) {
 			commands[i].func(parsing);
+			free_parsing(parsing);
 			return ;
 		}
 		i++;
