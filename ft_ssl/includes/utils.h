@@ -12,7 +12,7 @@ typedef enum e_source {
 	FILE_SRC
 } t_source; 
 
-void write_error(char *argv, int *err);
+void write_error(char *subcmd, char *argv, int err);
 char *to_hex(uint32_t value, char *output);
 int ft_strlen(char *s);
 int ft_strcmp(char *s1, char *s2);

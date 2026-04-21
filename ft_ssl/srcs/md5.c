@@ -80,6 +80,11 @@ char *read_file(char *path, size_t *len) {
 		*len += n;
 	}
 	close(fd);
+	if (!file_buffer) {
+		file_buffer = malloc(1);
+		if (!file_buffer)
+			return NULL;
+	}
 	return file_buffer;
 }
 
@@ -102,6 +107,11 @@ char *read_stdin(size_t *len) {
 		free(stdin_buffer);
 		stdin_buffer = tmp;
 		*len += n;
+	}
+	if (stdin_buffer == NULL) {
+		stdin_buffer = malloc(1);
+		if (!stdin_buffer)
+			return NULL;
 	}
 	stdin_buffer[*len] = '\0';
 	return stdin_buffer;
@@ -197,6 +207,10 @@ void	ft_md5(t_hash_parsing *parsing) {
 	for (int i = 0; i < parsing->nb_files; i++) {
 		len = 0;
 		file_buffer = read_file(parsing->files[i], &len);
+		if (!file_buffer) {
+			write_error("md5", parsing->files[i], errno);
+			continue;
+		}
 		hash = compute_hash(file_buffer, len);
 		print_hash(hash, parsing->files[i], parsing, cmd, FILE_SRC);
 		free(file_buffer);

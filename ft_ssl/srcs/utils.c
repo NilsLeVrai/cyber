@@ -1,12 +1,12 @@
 #include "../includes/utils.h"
 
-void write_error(char *argv, int *err) {
-	char *msg = argv;
-
+void write_error(char *subcmd, char *argv, int err) {
 	write(2, "ft_ssl: ", 8);
-	write(2, msg, ft_strlen(msg));
+	write(2, subcmd, ft_strlen(subcmd));
 	write(2, ": ", 2);
-	write(2, strerror(*err), ft_strlen(strerror(*err)));
+	write(2, argv, ft_strlen(argv));
+	write(2, ": ", 2);
+	write(2, strerror(err), ft_strlen(strerror(err)));
 	write(2, "\n", 1);
 }
 
@@ -39,7 +39,23 @@ int ft_strcmp(char *s1, char *s2) {
 
 void print_hash(char *hash, char *source, t_hash_parsing *parsing, char *cmd, t_source type) {
 	
-	if (parsing->flag_q) {
+	if (parsing->flag_p && type == STDIN) {
+		int src_len = ft_strlen(source);
+		if (src_len > 0 && source[src_len - 1] == '\n')
+			src_len--;
+		if (parsing->flag_q) {
+			write(1, source, src_len);
+			write(1, "\n", 1);
+			write(1, hash, ft_strlen(hash));
+			write(1, "\n", 1);
+		} else {
+			write(1, "(\"", 2);
+			write(1, source, src_len);
+			write(1, "\")= ", 4);
+			write(1, hash, ft_strlen(hash));
+			write(1, "\n", 1);
+		}
+	} else if (parsing->flag_q) {
 		write(1, hash, ft_strlen(hash));
 		write(1, "\n", 1);
 	} else if (parsing->flag_r && type == STRING) {
@@ -52,11 +68,6 @@ void print_hash(char *hash, char *source, t_hash_parsing *parsing, char *cmd, t_
 		write(1, hash, ft_strlen(hash));
 		write(1, " ", 1);
 		write(1, source, ft_strlen(source));
-		write(1, "\n", 1);
-	} else if (parsing->flag_p) {
-		write(1, source, ft_strlen(source));
-		write(1, "(stdin)= ", 9);
-		write(1, hash, ft_strlen(hash));
 		write(1, "\n", 1);
 	} else if (type == STDIN && !parsing->flag_p) {
 		write(1, "(stdin)= ", 9);

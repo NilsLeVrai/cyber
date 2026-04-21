@@ -36,18 +36,11 @@ void	dispatcher(char *command, t_hash_parsing *parsing) {
 	}
 }
 
-static void add_file(t_hash_parsing *parsing, char *argv, int *err) {
+static void add_file(t_hash_parsing *parsing, char *argv) {
 
 	char	**old;
 	int		i;
-	int		file;
 
-	file = open(argv, O_RDONLY);
-	if (file == -1) {
-		*err = errno;
-		return ;
-	}
-	close(file);
 	old = parsing->files;
 	i = 0;
 	parsing->files = malloc(sizeof(char *) * (parsing->nb_files + 1));
@@ -87,14 +80,12 @@ static void add_string(t_hash_parsing *parsing, char *str) {
 
 void check_parsing(int argc, char **argv, t_hash_parsing *parsing) {
 
-	int		err;
-
-	err = 0;
+	int only_files = 0;
 	if (argc < 2)
 		write(1, "Usage\n", 6); // change usage for a cooler one
 	init_parsing(parsing);
 	for (int i = 2; i < argc; i++) {
-		if (argv[i][0] == '-') {
+		if (!only_files && argv[i][0] == '-') {
 			for (int j = 1; argv[i][j] != '\0'; j++) {
 				switch (argv[i][j])
 				{
@@ -111,6 +102,7 @@ void check_parsing(int argc, char **argv, t_hash_parsing *parsing) {
 						if (i + 1 < argc) {
 							add_string(parsing, argv[i + 1]);
 							i++;
+							goto next_arg;
 						} else {
 							write(1, "no string after -s\n", 19);
 						}
@@ -119,12 +111,10 @@ void check_parsing(int argc, char **argv, t_hash_parsing *parsing) {
 						break;
 				}
 			}
+			next_arg:;
 		} else {
-			add_file(parsing, argv[i], &err);
-			if (err) {
-				write_error(argv[i], &err);
-				err = 0;
-			}
+			only_files = 1;
+			add_file(parsing, argv[i]);
 		}
 	}
 	return;
