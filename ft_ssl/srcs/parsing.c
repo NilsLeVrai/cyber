@@ -80,9 +80,12 @@ static void add_string(t_hash_parsing *parsing, char *str) {
 
 void check_parsing(int argc, char **argv, t_hash_parsing *parsing) {
 
-	int only_files = 0;
+	int only_files;
+
 	if (argc < 2)
-		write(1, "Usage\n", 6); // change usage for a cooler one
+		write(1, "Usage\n", 6);
+
+	only_files = 0;
 	init_parsing(parsing);
 	for (int i = 2; i < argc; i++) {
 		if (!only_files && argv[i][0] == '-') {

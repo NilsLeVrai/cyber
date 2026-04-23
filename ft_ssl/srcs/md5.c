@@ -1,11 +1,12 @@
 #include "../includes/md5.h"
+#include "../includes/utils.h"
 
-static uint32_t S[64] = {7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+static const uint32_t S[64] = {7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
 				5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
 				4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
 				6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21};
 
-static uint32_t K[64] = {0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
+static const uint32_t K[64] = {0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
 				0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
 				0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
 				0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
@@ -31,7 +32,7 @@ static void init_words(t_words *words) {
 	return ;
 }
 
-char *compute_hash(char *msg,  size_t len) {
+char *compute_MD5_hash(char *msg,  size_t len) {
 
 	char	*padded;
 	char	*hash;
@@ -52,69 +53,6 @@ char *compute_hash(char *msg,  size_t len) {
 	to_hex(words.d, hash + 24);
 	hash[32] = '\0';
 	return hash;
-}
-
-char *read_file(char *path, size_t *len) {
-
-	char	buf[1024];
-	char	*file_buffer;
-	char	*tmp;
-	int		n;
-	int		fd;
-
-
-	file_buffer = NULL;
-	fd = open(path, O_RDONLY);
-	if (fd == -1)
-		return NULL;
-	while((n = read(fd, buf, 1024)) > 0) {
-		tmp = malloc(sizeof(char) * (n + *len));
-		if (!tmp)
-			return NULL;
-		for (size_t i = 0; i < *len; i++)
-			tmp[i] = file_buffer[i];
-		for (int j = 0; j < n; j++)
-			tmp[j + *len] = buf[j];
-		free(file_buffer);
-		file_buffer = tmp;
-		*len += n;
-	}
-	close(fd);
-	if (!file_buffer) {
-		file_buffer = malloc(1);
-		if (!file_buffer)
-			return NULL;
-	}
-	return file_buffer;
-}
-
-char *read_stdin(size_t *len) {
-
-	char	buf[1024];
-	char	*stdin_buffer;
-	char	*tmp;
-	int		n;
-
-	stdin_buffer = NULL;
-	while((n = read(0, buf, 1024)) > 0) {
-		tmp = malloc(sizeof(char) * (n + *len + 1));
-		if (!tmp)
-			return NULL;
-		for (size_t i = 0; i < *len; i++)
-			tmp[i] = stdin_buffer[i];
-		for (int j = 0; j < n; j++)
-			tmp[j + *len] = buf[j];
-		free(stdin_buffer);
-		stdin_buffer = tmp;
-		*len += n;
-	}
-	if (stdin_buffer == NULL) {
-		stdin_buffer = malloc(1);
-		if (!stdin_buffer)
-			return NULL;
-	}
-	stdin_buffer[*len] = '\0';
-	return stdin_buffer;
 }
 
 char *padded_buffer(char *message, size_t len, size_t *padded_len) {
@@ -180,51 +118,6 @@ void operations(t_words *words, uint32_t *M) {
 }
 
 void	ft_md5(t_hash_parsing *parsing) {
-
-	size_t	len;
-	char	*hash;
-	char	*cmd;
-	char	*stdin_buffer;
-	char	*file_buffer;
-
-	hash = NULL;
-	cmd = "MD5";
-	len = 0;
-	if (parsing->flag_p) {
-		stdin_buffer = read_stdin(&len);
-		hash = compute_hash(stdin_buffer, len);
-		print_hash(hash, stdin_buffer, parsing, cmd, STDIN);
-		free(stdin_buffer);
-		free(hash);
-		hash = NULL;
-	}
-	for (int i = 0; i < parsing->nb_strings; i++) {
-		hash = compute_hash(parsing->strings[i], ft_strlen(parsing->strings[i]));
-		print_hash(hash, parsing->strings[i], parsing, cmd, STRING);
-		free(hash);
-		hash = NULL;
-	}
-	for (int i = 0; i < parsing->nb_files; i++) {
-		len = 0;
-		file_buffer = read_file(parsing->files[i], &len);
-		if (!file_buffer) {
-			write_error("md5", parsing->files[i], errno);
-			continue;
-		}
-		hash = compute_hash(file_buffer, len);
-		print_hash(hash, parsing->files[i], parsing, cmd, FILE_SRC);
-		free(file_buffer);
-		free(hash);
-		hash = NULL;
-	}
-	len = 0;
-	if (!parsing->flag_p && !parsing->nb_strings && !parsing->nb_files) {
-		stdin_buffer = read_stdin(&len);
-		hash = compute_hash(stdin_buffer, len);
-		print_hash(hash, NULL, parsing, cmd, STDIN);
-		free(stdin_buffer);
-	}
-	if (hash)
-		free(hash);
+	ft_do_hash(parsing, compute_MD5_hash, "MD5", "md5");
 	return ;
 }
