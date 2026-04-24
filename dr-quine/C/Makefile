@@ -24,7 +24,16 @@ fclean: clean
 
 re: fclean all
 
-nils: fclean
-	cd .. && git add . && git commit -m "update" && git push
+push:
+	make fclean
+	git -C .. add .
+	git commit -m "$(MSG)"
+	git push
 
-.PHONY: all clean fclean re nils
+test:
+	make re
+	./$(NAME) > output
+	diff output Colleen.c 
+	rm output
+
+.PHONY: all clean fclean re push test
