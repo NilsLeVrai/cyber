@@ -1,0 +1,24 @@
+global main
+
+extern printf
+extern exit
+; outside comment
+
+section .text
+	main:
+		push rbp
+		mov rbp, rsp
+
+		; add arguments
+		mov rsi, 10
+		mov rdx, 34
+		mov rcx, 9
+		lea rdi, [str]
+		call printf
+		call exit
+
+func:
+	ret
+
+section .data:
+	
