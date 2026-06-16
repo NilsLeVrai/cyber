@@ -20,4 +20,5 @@ int		ft_strcmp(char *s1, char *s2);
 void	print_hash(char *hash, char *source, t_hash_parsing *parsing, char *cmd, t_source type);
 char	*read_file(char *path, size_t *len);
 char	*read_stdin(size_t *len);
-void	ft_do_hash(t_hash_parsing *parsing, char *(*compute)(char *, size_t), char *cmd, char *err_cmd);
+void	ft_do_hash(t_hash_parsing *parsing, char *(*compute)(char *, size_t), char *cmd);
+char	*to_lower(char *cmd);

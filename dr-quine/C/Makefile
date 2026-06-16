@@ -33,4 +33,4 @@ test:
 nils: fclean
 	cd .. && git add . && git commit -m "update" && git push
 
-.PHONY: all clean fclean re nils
+.PHONY: all clean fclean re nils test

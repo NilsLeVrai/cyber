@@ -118,6 +118,6 @@ void operations(t_words *words, uint32_t *M) {
 }
 
 void	ft_md5(t_hash_parsing *parsing) {
-	ft_do_hash(parsing, compute_MD5_hash, "MD5", "md5");
+	ft_do_hash(parsing, compute_MD5_hash, "md5");
 	return ;
 }

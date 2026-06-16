@@ -1,4 +1,5 @@
 #include "../includes/utils.h"
+#include <stdio.h>
 
 void write_error(char *subcmd, char *argv, int err) {
 	write(2, "ft_ssl: ", 8);
@@ -21,14 +22,25 @@ char *to_hex(uint32_t value, char *output) {
 	return output;
 }
 
-char *to_hex_be(uint32_t value, char *output) {
-	uint8_t	byte;
-	for (int i = 0; i < 4; i++) {
-		byte = (value >> ((3 - i) * 8)) & 0xFF;
-		output[i * 2]     = "0123456789abcdef"[(byte >> 4) & 0xF];
-		output[i * 2 + 1] = "0123456789abcdef"[byte & 0xF];
+char	*to_lower(char *cmd) {
+
+	size_t	len;
+	size_t	i;
+	char	*p;
+
+	i = -1;
+	len = ft_strlen(cmd);
+	p = (char *)malloc(len * sizeof(char) + 1);
+	if (!p)
+		return NULL;
+	while (++i < len) {
+		if (cmd[i] >= 65 && cmd[i] <= 90)
+			p[i] = cmd[i] + 32;
+		else
+			p[i] = cmd[i];
 	}
-	return output;
+	p[i] = '\0';
+	return p;
 }
 
 int ft_strlen(char *s) {
@@ -110,7 +122,7 @@ char *read_stdin(size_t *len) {
 	return stdin_buffer;
 }
 
-void	ft_do_hash(t_hash_parsing *parsing, char*(*compute)(char *, size_t), char *cmd, char *err_cmd) {
+void	ft_do_hash(t_hash_parsing *parsing, char*(*compute)(char *, size_t), char *cmd) {
 	size_t	len;
 	char	*hash;
 	char	*stdin_buffer;
@@ -128,6 +140,7 @@ void	ft_do_hash(t_hash_parsing *parsing, char*(*compute)(char *, size_t), char *
 	}
 	for (int i = 0; i < parsing->nb_strings; i++) {
 		hash = compute(parsing->strings[i], ft_strlen(parsing->strings[i]));
+		printf("hash; %s\n", hash);
 		print_hash(hash, parsing->strings[i], parsing, cmd, STRING);
 		free(hash);
 		hash = NULL;
@@ -136,7 +149,7 @@ void	ft_do_hash(t_hash_parsing *parsing, char*(*compute)(char *, size_t), char *
 		len = 0;
 		file_buffer = read_file(parsing->files[i], &len);
 		if (!file_buffer) {
-			write_error(err_cmd, parsing->files[i], errno);
+			write_error(cmd, parsing->files[i], errno);
 			continue;
 		}
 		hash = compute(file_buffer, len);

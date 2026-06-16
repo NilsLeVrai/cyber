@@ -22,18 +22,23 @@ void	free_parsing(t_hash_parsing *parsing) {
 	free(parsing->files);
 }
 
-void	dispatcher(char *command, t_hash_parsing *parsing) {
-	int i;
+void	dispatcher(char *argv, t_hash_parsing *parsing) {
+	int		i;
+	char	*command;
 
 	i = 0;
+	command = to_lower(argv);
 	while (commands[i].name != NULL) {
 		if (ft_strcmp(command, commands[i].name) == 0) {
 			commands[i].func(parsing);
+			free(command);
 			free_parsing(parsing);
 			return ;
 		}
 		i++;
 	}
+	free(command);
+	free_parsing(parsing);
 }
 
 static void add_file(t_hash_parsing *parsing, char *argv) {
@@ -83,7 +88,7 @@ void check_parsing(int argc, char **argv, t_hash_parsing *parsing) {
 	int only_files;
 
 	if (argc < 2)
-		write(1, "Usage\n", 6);
+		write(1, "Usage: cmd [OPTION]\n", 21);
 
 	only_files = 0;
 	init_parsing(parsing);
