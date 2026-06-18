@@ -12,25 +12,58 @@ static const uint32_t K[64] = { 0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 
 
 static void init_hash_values(t_init_values *init_hash) {
 
-	init_hash->h0 = 0xc1059ed8;
-	init_hash->h1 = 0x367cd507;
-	init_hash->h2 = 0x3070dd17;
-	init_hash->h3 = 0xf70e5939;
-	init_hash->h4 = 0xffc00b31;
-	init_hash->h5 = 0x68581511;
-	init_hash->h6 = 0x64f98fa7;
-	init_hash->h7 = 0xbefa4fa4;
+	init_hash->h0 = 0x6a09e667;
+	init_hash->h1 = 0xbb67ae85;
+	init_hash->h2 = 0x3c6ef372;
+	init_hash->h3 = 0xa54ff53a;
+	init_hash->h4 = 0x510e527f;
+	init_hash->h5 = 0x9b05688c;
+	init_hash->h6 = 0x1f83d9ab;
+	init_hash->h7 = 0x5be0cd19;
 	return ;
 }
 
 static char *compute_SHA256_hash(char *msg,  size_t len) {
-	(void) msg;
-	(void)len;
-	(void)K;
-	t_init_values init_values;
+
+	char			*padded;
+	char			*hash;
+	t_init_values	init_values;
+	size_t			padded_len;
 
 	init_hash_values(&init_values);
-	return "oui";
+	padded = padded_buffer_sha256(msg, len, &padded_len);
+	for (char *chunk = padded; chunk < padded + padded_len; chunk += 64)
+		sha256_operations(&init_values, (uint32_t *)chunk);
+	free(padded);
+	hash = malloc(sizeof(char) * 65);
+	//do things
+	if (!hash)
+		return NULL;
+	return hash;
+}
+
+char *padded_buffer_sha256(char *message, size_t len, size_t *padded_len) {
+
+	char	*sha256_buffer;
+	size_t	tmp;
+
+	*padded_len = ((len + 1 + 8 + 63) / 64) * 64;
+	sha256_buffer = malloc(sizeof(char) * *padded_len);
+	if (!sha256_buffer)
+		return NULL;
+	for (size_t i = 0; i < len; i++) {
+		sha256_buffer[i] = message[i];
+	}
+	tmp = len; // ?
+	sha256_buffer[len] = 0x80;
+	len++;
+	while (len < *padded_len - 8) {
+		sha256_buffer[len] = 0x0;
+		len++;
+	}
+	for (int i = 7; i >= 0; i--)
+		sha256_buffer[*padded_len - 8 + i] = ((tmp * 8) >> ((7 - i) * 8)) & 0xFF;
+	return sha256_buffer;
 }
 
 /*
@@ -39,6 +72,9 @@ shift << 2
 
 */
 
+void sha256_operations(t_init_values *init_values, uint32_t *M) {
+	return ;
+}
 
 
 void	ft_sha256(t_hash_parsing *parsing)

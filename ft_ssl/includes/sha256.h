@@ -17,3 +17,5 @@ typedef struct s_initial_hash_value {
 } t_init_values;
 
 void	ft_sha256(t_hash_parsing *parsing);
+char	*padded_buffer_sha256(char *message, size_t len, size_t *padded_len);
+void	sha256_operations(t_init_values *init_values, uint32_t *M);

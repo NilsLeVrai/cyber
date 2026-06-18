@@ -40,9 +40,9 @@ char *compute_MD5_hash(char *msg,  size_t len) {
 	size_t	padded_len;
 
 	init_words(&words);
-	padded = padded_buffer(msg, len, &padded_len);
+	padded = padded_buffer_md5(msg, len, &padded_len);
 	for (char *chunk = padded; chunk < padded + padded_len; chunk += 64)
-		operations(&words, (uint32_t *)chunk);
+		md5_operations(&words, (uint32_t *)chunk);
 	free(padded);
 	hash = malloc(sizeof(char) * 33);
 	if (!hash)
@@ -55,7 +55,7 @@ char *compute_MD5_hash(char *msg,  size_t len) {
 	return hash;
 }
 
-char *padded_buffer(char *message, size_t len, size_t *padded_len) {
+char *padded_buffer_md5(char *message, size_t len, size_t *padded_len) {
 
 	char	*md5_buffer;
 	size_t			tmp;
@@ -79,7 +79,7 @@ char *padded_buffer(char *message, size_t len, size_t *padded_len) {
 	return md5_buffer;
 }
 
-void operations(t_words *words, uint32_t *M) {
+void md5_operations(t_words *words, uint32_t *M) {
 
 	uint32_t	h0 = words->a;
 	uint32_t	h1 = words->b;

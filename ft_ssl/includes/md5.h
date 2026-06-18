@@ -13,6 +13,6 @@ typedef struct s_four_word_buffer {
 } t_words;
 
 char	*compute_MD5_hash(char *msg,  size_t len);
-char	*padded_buffer(char *message, size_t len, size_t *padded_len);
+char	*padded_buffer_md5(char *message, size_t len, size_t *padded_len);
 void	ft_md5(t_hash_parsing *parsing);
-void	operations(t_words *words, uint32_t *M);
+void	md5_operations(t_words *words, uint32_t *M);
