@@ -140,7 +140,6 @@ void	ft_do_hash(t_hash_parsing *parsing, char*(*compute)(char *, size_t), char *
 	}
 	for (int i = 0; i < parsing->nb_strings; i++) {
 		hash = compute(parsing->strings[i], ft_strlen(parsing->strings[i]));
-		printf("hash; %s\n", hash);
 		print_hash(hash, parsing->strings[i], parsing, cmd, STRING);
 		free(hash);
 		hash = NULL;

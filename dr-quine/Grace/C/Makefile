@@ -5,7 +5,7 @@ CXXFLAGS = -Wall -Werror -Wextra
 INCLUDES = -I ./includes/
 
 SRC_DIR = .
-SOURCES = Colleen.c
+SOURCES = Grace_kid.c
 OBJECTS = $(SOURCES:.c=.o)
 
 all: $(NAME)
@@ -17,10 +17,11 @@ $(NAME): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDES)
 
 clean:
-	rm -f $(OBJECTS)
+	@$(RM) $(OBJECTS)
 
 fclean: clean
-	rm -f $(NAME)
+	@$(RM) $(NAME)
+	@$(RM) outfile output
 
 re: fclean all
 
