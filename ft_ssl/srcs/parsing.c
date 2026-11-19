@@ -1,5 +1,8 @@
 #include "../includes/ft_ssl.h"
 
+#define USAGE_MSG "ft_ssl: usage: ft_ssl command [flags] [file/string]\n"
+#define NO_ARG_S_MSG "ft_ssl: -s: option requires an argument\n"
+
 static t_command commands[] = {
 	{"md5", ft_md5},
 	{"sha256", ft_sha256},
@@ -22,23 +25,33 @@ void	free_parsing(t_hash_parsing *parsing) {
 	free(parsing->files);
 }
 
-void	dispatcher(char *argv, t_hash_parsing *parsing) {
+int	dispatcher(char *argv, t_hash_parsing *parsing) {
 	int		i;
+	int		status;
 	char	*command;
 
 	i = 0;
 	command = to_lower(argv);
+	if (!command) {
+		write_error(NULL, NULL, errno);
+		free_parsing(parsing);
+		return (EXIT_FAILURE);
+	}
 	while (commands[i].name != NULL) {
 		if (ft_strcmp(command, commands[i].name) == 0) {
-			commands[i].func(parsing);
+			status = commands[i].func(parsing);
 			free(command);
 			free_parsing(parsing);
-			return ;
+			return (status);
 		}
 		i++;
 	}
+	write(2, "ft_ssl: Error: '", 16);
+	write(2, argv, ft_strlen(argv));
+	write(2, "' is an invalid command.\n", 25);
 	free(command);
 	free_parsing(parsing);
+	return (EXIT_FAILURE);
 }
 
 static void add_file(t_hash_parsing *parsing, char *argv) {
@@ -50,8 +63,10 @@ static void add_file(t_hash_parsing *parsing, char *argv) {
 	i = 0;
 	parsing->files = malloc(sizeof(char *) * (parsing->nb_files + 1));
 	if (!parsing->files) {
-		write(1, "alloc failed\n", 13);
-		return;
+		write_error(NULL, NULL, errno);
+		parsing->files = old;
+		free_parsing(parsing);
+		exit(EXIT_FAILURE);
 	}
 	while (i < parsing->nb_files) {
 		parsing->files[i] = old[i];
@@ -71,8 +86,10 @@ static void add_string(t_hash_parsing *parsing, char *str) {
 	old = parsing->strings;
 	parsing->strings = malloc(sizeof(char *) * (parsing->nb_strings + 1));
 	if (!parsing->strings) {
-		write(1, "alloc failed\n", 13);
-		return;
+		write_error(NULL, NULL, errno);
+		parsing->strings = old;
+		free_parsing(parsing);
+		exit(EXIT_FAILURE);
 	}
 	while (i < parsing->nb_strings) {
 		parsing->strings[i] = old[i];
@@ -87,8 +104,10 @@ void check_parsing(int argc, char **argv, t_hash_parsing *parsing) {
 
 	int only_files;
 
-	if (argc < 2)
-		write(1, "Usage: cmd [OPTION]\n", 21);
+	if (argc < 2) {
+		write(2, USAGE_MSG, ft_strlen(USAGE_MSG));
+		exit(EXIT_FAILURE);
+	}
 
 	only_files = 0;
 	init_parsing(parsing);
@@ -112,9 +131,10 @@ void check_parsing(int argc, char **argv, t_hash_parsing *parsing) {
 							i++;
 							goto next_arg;
 						} else {
-							write(1, "no string after -s\n", 19);
+							write(2, NO_ARG_S_MSG, ft_strlen(NO_ARG_S_MSG));
+							free_parsing(parsing);
+							exit(EXIT_FAILURE);
 						}
-						break;
 					default:
 						break;
 				}

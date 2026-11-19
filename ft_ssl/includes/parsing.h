@@ -16,10 +16,10 @@ typedef struct s_hash_parsing {
 
 typedef struct	s_command {
 	char	*name;
-	void	(*func)(t_hash_parsing *);
+	int		(*func)(t_hash_parsing *);
 } t_command;
 
 void init_parsing(t_hash_parsing *parsing);
-void dispatcher(char *argv, t_hash_parsing *parsing);
+int  dispatcher(char *argv, t_hash_parsing *parsing);
 void check_parsing(int argc, char **argv, t_hash_parsing *parsing);
 void free_parsing(t_hash_parsing *parsing);

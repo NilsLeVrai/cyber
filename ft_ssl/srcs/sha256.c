@@ -79,8 +79,7 @@ void sha256_operations(t_init_values *init_values, uint32_t *M) {
 }
 
 
-void	ft_sha256(t_hash_parsing *parsing)
+int	ft_sha256(t_hash_parsing *parsing)
 {
-	ft_do_hash(parsing, compute_SHA256_hash, "sha256");
-	return ;
+	return ft_do_hash(parsing, compute_SHA256_hash, "SHA256");
 }

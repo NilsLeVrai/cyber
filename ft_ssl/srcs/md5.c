@@ -117,7 +117,6 @@ void md5_operations(t_words *words, uint32_t *M) {
 	words->d += h3;
 }
 
-void	ft_md5(t_hash_parsing *parsing) {
-	ft_do_hash(parsing, compute_MD5_hash, "MD5");
-	return ;
+int	ft_md5(t_hash_parsing *parsing) {
+	return ft_do_hash(parsing, compute_MD5_hash, "MD5");
 }

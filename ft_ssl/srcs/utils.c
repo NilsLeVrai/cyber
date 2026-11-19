@@ -1,12 +1,15 @@
 #include "../includes/utils.h"
-#include <stdio.h>
 
 void write_error(char *subcmd, char *argv, int err) {
 	write(2, "ft_ssl: ", 8);
-	write(2, subcmd, ft_strlen(subcmd));
-	write(2, ": ", 2);
-	write(2, argv, ft_strlen(argv));
-	write(2, ": ", 2);
+	if (subcmd) {
+		write(2, subcmd, ft_strlen(subcmd));
+		write(2, ": ", 2);
+	}
+	if (argv) {
+		write(2, argv, ft_strlen(argv));
+		write(2, ": ", 2);
+	}
 	write(2, strerror(err), ft_strlen(strerror(err)));
 	write(2, "\n", 1);
 }
@@ -66,6 +69,7 @@ char *read_file(char *path, size_t *len) {
 	char	*tmp;
 	int		n;
 	int		fd;
+	int		err;
 
 
 	file_buffer = NULL;
@@ -74,8 +78,11 @@ char *read_file(char *path, size_t *len) {
 		return NULL;
 	while((n = read(fd, buf, 1024)) > 0) {
 		tmp = malloc(sizeof(char) * (n + *len));
-		if (!tmp)
+		if (!tmp) {
+			free(file_buffer);
+			close(fd);
 			return NULL;
+		}
 		for (size_t i = 0; i < *len; i++)
 			tmp[i] = file_buffer[i];
 		for (int j = 0; j < n; j++)
@@ -83,6 +90,13 @@ char *read_file(char *path, size_t *len) {
 		free(file_buffer);
 		file_buffer = tmp;
 		*len += n;
+	}
+	if (n == -1) {
+		err = errno;
+		free(file_buffer);
+		close(fd);
+		errno = err;
+		return NULL;
 	}
 	close(fd);
 	if (!file_buffer) {
@@ -99,12 +113,15 @@ char *read_stdin(size_t *len) {
 	char	*stdin_buffer;
 	char	*tmp;
 	int		n;
+	int		err;
 
 	stdin_buffer = NULL;
 	while((n = read(0, buf, 1024)) > 0) {
 		tmp = malloc(sizeof(char) * (n + *len + 1));
-		if (!tmp)
+		if (!tmp) {
+			free(stdin_buffer);
 			return NULL;
+		}
 		for (size_t i = 0; i < *len; i++)
 			tmp[i] = stdin_buffer[i];
 		for (int j = 0; j < n; j++)
@@ -112,6 +129,12 @@ char *read_stdin(size_t *len) {
 		free(stdin_buffer);
 		stdin_buffer = tmp;
 		*len += n;
+	}
+	if (n == -1) {
+		err = errno;
+		free(stdin_buffer);
+		errno = err;
+		return NULL;
 	}
 	if (stdin_buffer == NULL) {
 		stdin_buffer = malloc(1);
@@ -122,21 +145,29 @@ char *read_stdin(size_t *len) {
 	return stdin_buffer;
 }
 
-void	ft_do_hash(t_hash_parsing *parsing, char*(*compute)(char *, size_t), char *cmd) {
+int	ft_do_hash(t_hash_parsing *parsing, char*(*compute)(char *, size_t), char *cmd) {
+	int		status;
 	size_t	len;
 	char	*hash;
 	char	*stdin_buffer;
 	char	*file_buffer;
 
+	status = EXIT_SUCCESS;
 	hash = NULL;
 	len = 0;
 	if (parsing->flag_p) {
 		stdin_buffer = read_stdin(&len);
-		hash = compute(stdin_buffer, len);
-		print_hash(hash, stdin_buffer, parsing, cmd, STDIN);
-		free(stdin_buffer);
-		free(hash);
-		hash = NULL;
+		if (!stdin_buffer) {
+			write_error(cmd, "stdin", errno);
+			status = EXIT_FAILURE;
+		}
+		else {
+			hash = compute(stdin_buffer, len);
+			print_hash(hash, stdin_buffer, parsing, cmd, STDIN);
+			free(stdin_buffer);
+			free(hash);
+			hash = NULL;
+		}
 	}
 	for (int i = 0; i < parsing->nb_strings; i++) {
 		hash = compute(parsing->strings[i], ft_strlen(parsing->strings[i]));
@@ -149,6 +180,7 @@ void	ft_do_hash(t_hash_parsing *parsing, char*(*compute)(char *, size_t), char *
 		file_buffer = read_file(parsing->files[i], &len);
 		if (!file_buffer) {
 			write_error(cmd, parsing->files[i], errno);
+			status = EXIT_FAILURE;
 			continue;
 		}
 		hash = compute(file_buffer, len);
@@ -160,13 +192,19 @@ void	ft_do_hash(t_hash_parsing *parsing, char*(*compute)(char *, size_t), char *
 	len = 0;
 	if (!parsing->flag_p && !parsing->nb_strings && !parsing->nb_files) {
 		stdin_buffer = read_stdin(&len);
-		hash = compute(stdin_buffer, len);
-		print_hash(hash, NULL, parsing, cmd, STDIN);
-		free(stdin_buffer);
+		if (!stdin_buffer) {
+			write_error(cmd, "stdin", errno);
+			status = EXIT_FAILURE;
+		}
+		else {
+			hash = compute(stdin_buffer, len);
+			print_hash(hash, NULL, parsing, cmd, STDIN);
+			free(stdin_buffer);
+		}
 	}
 	if (hash)
 		free(hash);
-	return ;
+	return (status);
 }
 
 void print_hash(char *hash, char *source, t_hash_parsing *parsing, char *cmd, t_source type) {
