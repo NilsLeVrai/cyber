@@ -14,8 +14,9 @@ typedef enum e_source {
 } t_source; 
 
 void	write_error(char *subcmd, char *argv, int err);
-char	*to_hex(uint32_t value, char *output);
-int		ft_strlen(char *s);
+char	*to_hex_be(uint32_t value, char *output);
+char	*to_hex_le(uint32_t value, char *output);
+size_t	ft_strlen(char *s);
 int		ft_strcmp(char *s1, char *s2);
 void	print_hash(char *hash, char *source, t_hash_parsing *parsing, char *cmd, t_source type);
 char	*read_file(char *path, size_t *len);

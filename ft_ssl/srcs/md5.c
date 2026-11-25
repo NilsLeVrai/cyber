@@ -47,10 +47,10 @@ char *compute_MD5_hash(char *msg,  size_t len) {
 	hash = malloc(sizeof(char) * 33);
 	if (!hash)
 		return NULL;
-	to_hex(words.a, hash);
-	to_hex(words.b, hash + 8);
-	to_hex(words.c, hash + 16);
-	to_hex(words.d, hash + 24);
+	to_hex_le(words.a, hash);
+	to_hex_le(words.b, hash + 8);
+	to_hex_le(words.c, hash + 16);
+	to_hex_le(words.d, hash + 24);
 	hash[32] = '\0';
 	return hash;
 }
